@@ -1,19 +1,31 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"fmt"
+	"log"
+)
 
 func main() {
-	rl.InitWindow(800, 450, "raylib [core] example - basic window")
-	defer rl.CloseWindow()
-
-	rl.SetTargetFPS(60)
-
-	for !rl.WindowShouldClose() {
-		rl.BeginDrawing()
-
-		rl.ClearBackground(rl.RayWhite)
-		rl.DrawText("Congrats! You created your first window!", 190, 200, 20, rl.LightGray)
-
-		rl.EndDrawing()
+	fmt.Println("Welcome to calculator!")
+	for {
+		option, err := getOption([]Option{
+			{"C", "Calculate a recipe chain"},
+			{"I", "Browse Items"},
+			{"R", "Browse Recipes"},
+			{"X", "Exit"},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		switch option {
+		case "C":
+			calculateRecipeChain()
+		case "I":
+			browseItems()
+		case "R":
+			calculateRecipeChain()
+		case "X":
+			return
+		}
 	}
 }
