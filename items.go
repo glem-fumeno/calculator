@@ -2,33 +2,37 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
-	"github.com/glem-fumeno/calculator/queries"
 	"github.com/glem-fumeno/calculator/schemas"
 )
 
 func browseItems() {
-	fmt.Println("Browsing items")
+	error := ""
 	for {
 		options := []Option{}
-		items := fetchItems()
+		items, err := service.Items.ReadAll()
+		if err != nil {
+			panic(err)
+		}
 		for i, item := range items {
 			options = append(
 				options,
 				Option{
 					fmt.Sprint(i + 1),
-					fmt.Sprintf("%s (%s)", item.ItemName, item.Unit),
+					fmt.Sprintf("%s", item.ItemName),
 				},
 			)
 		}
-		options = append(options, Option{"A", "Add an item"})
-		options = append(options, Option{"B", "Back"})
-		option, err := getOption(options)
-		if err != nil {
-			log.Fatal(err)
-		}
+		option := getOption(
+			"Browsing items",
+			error,
+			append(
+				options,
+				Option{"A", "Add an item"},
+				Option{"B", "Back"},
+			),
+		)
 		switch option {
 		case "A":
 			addItem()
@@ -42,44 +46,31 @@ func browseItems() {
 	}
 }
 func addItem() {
-	fmt.Println("Adding an item")
 	item := schemas.DBItem{}
+	error := ""
+	item.ItemName = getUserInput("Name")
+	item.Unit = getUserInput("Unit")
 	for {
-		option, err := getOption([]Option{
-			{"N", fmt.Sprintf("Name: %s", item.ItemName)},
-			{"U", fmt.Sprintf("Unit: %s", item.Unit)},
-			{"S", "Add and go back"},
-			{"B", "Back"},
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
+		option := getOption(
+			"Adding an item",
+			error,
+			[]Option{
+				{"N", fmt.Sprintf("Name: %s", item.ItemName)},
+				{"U", fmt.Sprintf("Unit: %s", item.Unit)},
+				{"S", "Save and go back"},
+				{"B", "Back"},
+			})
 		switch option {
 		case "N":
-			name, err := getUserInput("Name")
-			if err != nil {
-				fmt.Println("Could not get user input")
-				continue
-			}
-			item.ItemName = name
+			item.ItemName = getUserInput("Name")
 		case "U":
-			unit, err := getUserInput("Unit")
-			if err != nil {
-				fmt.Println("Could not get user input")
-				continue
-			}
-			item.Unit = unit
+			item.Unit = getUserInput("Unit")
 		case "S":
-			fmt.Println(item.ItemName)
-			if len(item.ItemName) < 1 {
-				fmt.Println("Item name must not be empty")
+			err := service.Items.Create(item)
+			if err != nil {
+				error = err.Error()
 				continue
 			}
-			if len(item.Unit) < 1 {
-				fmt.Println("Unit must not be empty")
-				continue
-			}
-			createItem(item)
 			return
 		case "B":
 			return
@@ -88,100 +79,39 @@ func addItem() {
 }
 func editItem(item schemas.DBItem) {
 	itemName := item.ItemName
+	error := ""
 	for {
-		fmt.Printf("Editing %s\n", itemName)
-		option, err := getOption([]Option{
-			{"N", fmt.Sprintf("Name: %s", item.ItemName)},
-			{"U", fmt.Sprintf("Unit: %s", item.Unit)},
-			{"D", "Delete"},
-			{"S", "Save and go back"},
-			{"B", "Back"},
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
+		option := getOption(
+			fmt.Sprintf("Editing %s", itemName),
+			error,
+			[]Option{
+				{"N", fmt.Sprintf("Name: %s", item.ItemName)},
+				{"U", fmt.Sprintf("Unit: %s", item.Unit)},
+				{"D", "Delete"},
+				{"S", "Save and go back"},
+				{"B", "Back"},
+			})
 		switch option {
 		case "N":
-			name, err := getUserInput("Name")
-			if err != nil {
-				fmt.Println("Could not get user input")
-				continue
-			}
-			item.ItemName = name
-		case "D":
-			deleteItem(itemName)
-			return
+			item.ItemName = getUserInput("Name")
 		case "U":
-			unit, err := getUserInput("Unit")
+			item.Unit = getUserInput("Unit")
+		case "D":
+			err := service.Items.Delete(itemName)
 			if err != nil {
-				fmt.Println("Could not get user input")
+				error = err.Error()
 				continue
 			}
-			item.Unit = unit
+			return
 		case "S":
-			if len(item.ItemName) < 1 {
-				fmt.Println("Item name must not be empty")
+			err := service.Items.Update(itemName, item)
+			if err != nil {
+				error = err.Error()
 				continue
 			}
-			if len(item.Unit) < 1 {
-				fmt.Println("Unit must not be empty")
-				continue
-			}
-			saveItem(itemName, item)
 			return
 		case "B":
 			return
 		}
-	}
-}
-
-func fetchItems() []schemas.DBItem {
-	queries, err := queries.NewQueries("app.db")
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	defer queries.Close(&err)
-	items, err := queries.Items.SelectMany()
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	return items
-}
-func saveItem(name string, item schemas.DBItem) {
-	queries, err := queries.NewQueries("app.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer queries.Close(&err)
-	err = queries.Items.Update(name, item)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-func createItem(item schemas.DBItem) {
-	queries, err := queries.NewQueries("app.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer queries.Close(&err)
-	err = queries.Items.Insert(item)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-func deleteItem(name string) {
-	queries, err := queries.NewQueries("app.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer queries.Close(&err)
-	err = queries.Items.Delete(name)
-	if err != nil {
-		fmt.Println(err)
 	}
 }

@@ -13,33 +13,33 @@ type Option struct {
 	text string
 }
 
-func getUserInput(prompt string) (string, error) {
+func getUserInput(prompt string) string {
 	fmt.Printf("%s: ", prompt)
 	reader := bufio.NewReader(os.Stdin)
 	option, err := reader.ReadString('\n')
 	if err != nil {
-		return "", err
+		panic(err)
 	}
-	return strings.TrimSpace(option), nil
+	return strings.TrimSpace(option)
 }
 
-func getOption(options []Option) (string, error) {
+func getOption(title, error string, options []Option) string {
 	keys := make([]string, len(options))
 	for i, option := range options {
 		keys[i] = option.key
 	}
 	for {
+		fmt.Print("\033[2J\033[H")
+		fmt.Printf("\033[1;31m%s\033[0m\n", error)
+		fmt.Println(title)
 		for _, option := range options {
 			fmt.Printf("%s - %s\n", option.key, option.text)
 		}
-		option, err := getUserInput("Choose")
-		if err != nil {
-			return "", err
-		}
+		option := getUserInput("Choose")
 		option = strings.ToUpper(option)
 		if slices.Contains(keys, option) {
-			return option, nil
+			return option
 		}
-		fmt.Printf("Invalid option '%s'\n", option)
+		error = fmt.Sprintf("Invalid option '%s'", option)
 	}
 }

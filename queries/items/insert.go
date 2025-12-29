@@ -1,6 +1,8 @@
 package items
 
-import "github.com/glem-fumeno/calculator/schemas"
+import (
+	"github.com/glem-fumeno/calculator/schemas"
+)
 
 func (q *Queries) Insert(item schemas.DBItem) error {
 	const query = `

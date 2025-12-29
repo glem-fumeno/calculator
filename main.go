@@ -1,22 +1,34 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"database/sql"
+
+	"github.com/glem-fumeno/calculator/services"
+	_ "github.com/mattn/go-sqlite3"
+)
+
+var (
+	service services.Services
 )
 
 func main() {
-	fmt.Println("Welcome to calculator!")
+	database, err := sql.Open("sqlite3", "app.db")
+	if err != nil {
+		panic(err)
+	}
+	defer database.Close()
+	service = services.NewServices(database)
 	for {
-		option, err := getOption([]Option{
-			{"C", "Calculate a recipe chain"},
-			{"I", "Browse Items"},
-			{"R", "Browse Recipes"},
-			{"X", "Exit"},
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
+		option := getOption(
+			"Welcome to calculator!",
+			"",
+			[]Option{
+				{"C", "Calculate a recipe chain"},
+				{"I", "Browse Items"},
+				{"R", "Browse Recipes"},
+				{"X", "Exit"},
+			},
+		)
 		switch option {
 		case "C":
 			calculateRecipeChain()
