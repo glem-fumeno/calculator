@@ -1,4 +1,4 @@
-package main
+package tui
 
 import (
 	"bufio"
@@ -13,7 +13,11 @@ type Option struct {
 	text string
 }
 
-func getUserInput(prompt string) string {
+func NewOption(key, text string) Option {
+	return Option{key, text}
+}
+
+func GetInput(prompt string) string {
 	fmt.Printf("%s: ", prompt)
 	reader := bufio.NewReader(os.Stdin)
 	option, err := reader.ReadString('\n')
@@ -23,7 +27,7 @@ func getUserInput(prompt string) string {
 	return strings.TrimSpace(option)
 }
 
-func getOption(title, error string, options []Option) string {
+func GetOption(title, error string, options []Option) string {
 	keys := make([]string, len(options))
 	for i, option := range options {
 		keys[i] = option.key
@@ -35,7 +39,7 @@ func getOption(title, error string, options []Option) string {
 		for _, option := range options {
 			fmt.Printf("%s - %s\n", option.key, option.text)
 		}
-		option := getUserInput("Choose")
+		option := GetInput("Choose")
 		option = strings.ToUpper(option)
 		if slices.Contains(keys, option) {
 			return option
