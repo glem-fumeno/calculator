@@ -3,7 +3,6 @@ package app
 import (
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type AddItemState struct {
@@ -29,23 +28,21 @@ func NewAddItemState(
 func (s *AddItemState) GetError() string {
 	return s.error
 }
-func (s *AddItemState) GetTitle() string {
-	return "Adding an item"
-}
-func (s *AddItemState) GetOptions() []tui.Option {
-	return []tui.Option{
-		tui.NewOption("N", "Name: %s", s.item.ItemName),
-		tui.NewOption("U", "Unit: %s", s.item.Unit),
-		tui.NewOption("S", "Save and go back"),
-		tui.NewOption("B", "Back"),
-	}
+func (s *AddItemState) GetOptions() Options {
+	return NewOptions(
+		NewLine("Adding an item"),
+		NewOption("N", "Name: %s", s.item.ItemName),
+		NewOption("U", "Unit: %s", s.item.Unit),
+		NewOption("S", "Save and go back"),
+		NewOption("B", "Back"),
+	)
 }
 func (s *AddItemState) Run(option string) State {
 	switch option {
 	case "N":
-		s.item.ItemName = tui.GetInput("Name")
+		s.item.ItemName = GetInput("Name")
 	case "U":
-		s.item.Unit = tui.GetInput("Unit")
+		s.item.Unit = GetInput("Unit")
 	case "S":
 		err := s.Services.Items.Create(s.item)
 		if err == nil {

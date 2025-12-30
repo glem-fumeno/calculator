@@ -6,7 +6,6 @@ import (
 
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type BrowseItemsState struct {
@@ -27,26 +26,21 @@ func NewBrowseItemsState(
 func (s *BrowseItemsState) GetError() string {
 	return s.error
 }
-func (s *BrowseItemsState) GetTitle() string {
-	return "Browsing Items"
-}
-func (s *BrowseItemsState) GetOptions() []tui.Option {
-	options := []tui.Option{}
+func (s *BrowseItemsState) GetOptions() Options {
 	items, err := s.Services.Items.ReadAll()
 	if err != nil {
 		panic(err)
 	}
 	s.items = items
+	options := NewOptions(NewLine("Browsing Items"))
 	for i, item := range items {
-		options = append(
-			options,
-			tui.NewOption(fmt.Sprint(i+1), "%s", item.ItemName),
+		options = options.Add(
+			NewOption(fmt.Sprint(i+1), "%s", item.ItemName),
 		)
 	}
-	return append(
-		options,
-		tui.NewOption("A", "Add an item"),
-		tui.NewOption("B", "Back"),
+	return options.Add(
+		NewOption("A", "Add an item"),
+		NewOption("B", "Back"),
 	)
 }
 func (s *BrowseItemsState) Run(option string) State {
@@ -54,7 +48,7 @@ func (s *BrowseItemsState) Run(option string) State {
 	case "A":
 		return NewAddItemState(
 			s, s.Services,
-			tui.GetInput("Name"), tui.GetInput("Unit"),
+			GetInput("Name"), GetInput("Unit"),
 		)
 	case "B":
 		return s.Parent

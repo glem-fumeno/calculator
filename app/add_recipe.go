@@ -3,7 +3,6 @@ package app
 import (
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type AddRecipeState struct {
@@ -29,20 +28,18 @@ func NewAddRecipeState(
 func (s *AddRecipeState) GetError() string {
 	return s.error
 }
-func (s *AddRecipeState) GetTitle() string {
-	return "Adding an recipe"
-}
-func (s *AddRecipeState) GetOptions() []tui.Option {
-	return []tui.Option{
-		tui.NewOption("N", "Name: %s", s.recipe.RecipeName),
-		tui.NewOption("S", "Save and go back"),
-		tui.NewOption("B", "Back"),
-	}
+func (s *AddRecipeState) GetOptions() Options {
+	return NewOptions(
+		NewLine("Adding an recipe"),
+		NewOption("N", "Name: %s", s.recipe.RecipeName),
+		NewOption("S", "Save and go back"),
+		NewOption("B", "Back"),
+	)
 }
 func (s *AddRecipeState) Run(option string) State {
 	switch option {
 	case "N":
-		s.recipe.RecipeName = tui.GetInput("Name")
+		s.recipe.RecipeName = GetInput("Name")
 	case "S":
 		err := s.Services.Recipes.Create(s.recipe)
 		if err == nil {

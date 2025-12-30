@@ -11,9 +11,9 @@ func (s *Services) ReadAll() ([]schemas.DBRecipe, error) {
 		return nil, err
 	}
 	defer queries.Rollback()
-	items, err := queries.Recipes.SelectMany()
+	recipes, err := queries.Recipes.SelectMany()
 	if err != nil {
 		return nil, err
 	}
-	return items, nil
+	return recipes, nil
 }

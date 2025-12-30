@@ -1,4 +1,4 @@
-package tui
+package app
 
 import (
 	"bufio"
@@ -13,8 +13,21 @@ type Option struct {
 	text string
 }
 
+type Options []Option
+
+func NewOptions(options ...Option) Options {
+	return options
+}
+
+func (o Options) Add(options ...Option) Options {
+	return append(o, options...)
+}
+
 func NewOption(key, text string, a ...any) Option {
 	return Option{key, fmt.Sprintf(text, a...)}
+}
+func NewLine(text string, a ...any) Option {
+	return Option{"", fmt.Sprintf(text, a...)}
 }
 
 func GetInput(prompt string) string {
@@ -27,17 +40,22 @@ func GetInput(prompt string) string {
 	return strings.TrimSpace(option)
 }
 
-func GetOption(title, error string, options []Option) string {
-	keys := make([]string, len(options))
-	for i, option := range options {
-		keys[i] = option.key
+func GetOption(error string, options Options) string {
+	keys := make([]string, 0, len(options))
+	for _, option := range options {
+		if option.key != "" {
+			keys = append(keys, option.key)
+		}
 	}
 	for {
 		fmt.Print("\033[2J\033[H")
 		fmt.Printf("\033[1;31m%s\033[0m\n", error)
-		fmt.Println(title)
 		for _, option := range options {
-			fmt.Printf("%s - %s\n", option.key, option.text)
+			if option.key == "" {
+				fmt.Println(option.text)
+			} else {
+				fmt.Printf("%s - %s\n", option.key, option.text)
+			}
 		}
 		option := GetInput("Choose")
 		option = strings.ToUpper(option)

@@ -1,11 +1,8 @@
 package app
 
-import "github.com/glem-fumeno/calculator/tui"
-
 type State interface {
 	GetError() string
-	GetTitle() string
-	GetOptions() []tui.Option
+	GetOptions() Options
 	Run(option string) State
 }
 
@@ -15,8 +12,7 @@ type App struct {
 
 func (a *App) Run() {
 	for {
-		option := tui.GetOption(
-			a.State.GetTitle(),
+		option := GetOption(
 			a.State.GetError(),
 			a.State.GetOptions(),
 		)

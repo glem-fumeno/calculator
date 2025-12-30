@@ -1,11 +1,8 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type EditItemState struct {
@@ -33,24 +30,22 @@ func NewEditItemState(
 func (s *EditItemState) GetError() string {
 	return s.error
 }
-func (s *EditItemState) GetTitle() string {
-	return fmt.Sprintf("Editing %s", s.itemName)
-}
-func (s *EditItemState) GetOptions() []tui.Option {
-	return []tui.Option{
-		tui.NewOption("N", "Name: %s", s.item.ItemName),
-		tui.NewOption("U", "Unit: %s", s.item.Unit),
-		tui.NewOption("D", "Delete"),
-		tui.NewOption("S", "Save and go back"),
-		tui.NewOption("B", "Back"),
-	}
+func (s *EditItemState) GetOptions() Options {
+	return NewOptions(
+		NewLine("Editing %s", s.itemName),
+		NewOption("N", "Name: %s", s.item.ItemName),
+		NewOption("U", "Unit: %s", s.item.Unit),
+		NewOption("D", "Delete"),
+		NewOption("S", "Save and go back"),
+		NewOption("B", "Back"),
+	)
 }
 func (s *EditItemState) Run(option string) State {
 	switch option {
 	case "N":
-		s.item.ItemName = tui.GetInput("Name")
+		s.item.ItemName = GetInput("Name")
 	case "U":
-		s.item.Unit = tui.GetInput("Unit")
+		s.item.Unit = GetInput("Unit")
 	case "D":
 		err := s.Services.Items.Delete(s.itemName)
 		if err == nil {

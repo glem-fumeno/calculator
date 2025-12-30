@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type StartState struct {
@@ -20,16 +19,14 @@ func NewStartState(database *sql.DB) *StartState {
 func (s *StartState) GetError() string {
 	return ""
 }
-func (s *StartState) GetTitle() string {
-	return "Welcome to calculator!"
-}
-func (s *StartState) GetOptions() []tui.Option {
-	return []tui.Option{
-		tui.NewOption("C", "Calculate a recipe chain"),
-		tui.NewOption("I", "Browse Items"),
-		tui.NewOption("R", "Browse Recipes"),
-		tui.NewOption("X", "Exit"),
-	}
+func (s *StartState) GetOptions() Options {
+	return NewOptions(
+		NewLine("Welcome to calculator!"),
+		NewOption("C", "Calculate a recipe chain"),
+		NewOption("I", "Browse Items"),
+		NewOption("R", "Browse Recipes"),
+		NewOption("X", "Exit"),
+	)
 }
 func (s *StartState) Run(option string) State {
 	switch option {

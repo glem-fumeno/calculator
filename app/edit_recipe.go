@@ -5,7 +5,6 @@ import (
 
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
-	"github.com/glem-fumeno/calculator/tui"
 )
 
 type EditRecipeState struct {
@@ -14,7 +13,7 @@ type EditRecipeState struct {
 
 	recipeName string
 	recipe     schemas.DBRecipe
-	error    string
+	error      string
 }
 
 func NewEditRecipeState(
@@ -23,8 +22,8 @@ func NewEditRecipeState(
 	recipe schemas.DBRecipe,
 ) *EditRecipeState {
 	return &EditRecipeState{
-		Parent:   parent,
-		Services: s,
+		Parent:     parent,
+		Services:   s,
 		recipeName: recipe.RecipeName,
 		recipe:     recipe,
 	}
@@ -33,21 +32,41 @@ func NewEditRecipeState(
 func (s *EditRecipeState) GetError() string {
 	return s.error
 }
-func (s *EditRecipeState) GetTitle() string {
-	return fmt.Sprintf("Editing %s", s.recipeName)
-}
-func (s *EditRecipeState) GetOptions() []tui.Option {
-	return []tui.Option{
-		tui.NewOption("N", "Name: %s", s.recipe.RecipeName),
-		tui.NewOption("D", "Delete"),
-		tui.NewOption("S", "Save and go back"),
-		tui.NewOption("B", "Back"),
+func (s *EditRecipeState) GetOptions() Options {
+	ingredients, products, err := s.Services.Recipes.ReadItems(s.recipeName)
+	if err != nil {
+		panic(err)
 	}
+	options := NewOptions(
+		NewLine("Editing %s", s.recipeName),
+		NewOption("N", "Name: %s", s.recipe.RecipeName),
+		NewOption("S", "Save name"),
+		NewLine("Ingredients"),
+		NewOption("IA", "Add ingredient"),
+	)
+	for i, item := range ingredients {
+		options = options.Add(
+			NewOption(fmt.Sprintf("I%d", i+1), "%s (%d)", item.ItemName, item.Quantity),
+		)
+	}
+	options = options.Add(
+		NewLine("Products"),
+		NewOption("PA", "Add Product"),
+	)
+	for i, item := range products {
+		options = options.Add(
+			NewOption(fmt.Sprintf("P%d", i+1), "%s (%d)", item.ItemName, item.Quantity),
+		)
+	}
+	return options.Add(
+		NewOption("D", "Delete"),
+		NewOption("B", "Back"),
+	)
 }
 func (s *EditRecipeState) Run(option string) State {
 	switch option {
 	case "N":
-		s.recipe.RecipeName = tui.GetInput("Name")
+		s.recipe.RecipeName = GetInput("Name")
 	case "D":
 		err := s.Services.Recipes.Delete(s.recipeName)
 		if err == nil {
