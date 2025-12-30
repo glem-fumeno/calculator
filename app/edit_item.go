@@ -2,34 +2,19 @@ package app
 
 import (
 	"github.com/glem-fumeno/calculator/schemas"
-	"github.com/glem-fumeno/calculator/services"
 )
 
 type EditItemState struct {
-	Parent   State
-	Services services.Services
+	*StateData
 
 	itemName string
 	item     schemas.DBItem
-	error    string
 }
 
-func NewEditItemState(
-	parent State,
-	s services.Services,
-	item schemas.DBItem,
-) *EditItemState {
-	return &EditItemState{
-		Parent:   parent,
-		Services: s,
-		itemName: item.ItemName,
-		item:     item,
-	}
+func NewEditItemState(parent State, item schemas.DBItem) *EditItemState {
+	return &EditItemState{NewStateData(parent), item.ItemName, item}
 }
 
-func (s *EditItemState) GetError() string {
-	return s.error
-}
 func (s *EditItemState) GetOptions() Options {
 	return NewOptions(
 		NewLine("Editing %s", s.itemName),

@@ -2,32 +2,21 @@ package app
 
 import (
 	"github.com/glem-fumeno/calculator/schemas"
-	"github.com/glem-fumeno/calculator/services"
 )
 
 type AddRecipeState struct {
-	Parent   State
-	Services services.Services
+	*StateData
 
 	recipe schemas.DBRecipe
-	error  string
 }
 
-func NewAddRecipeState(
-	parent State,
-	s services.Services,
-	name string,
-) *AddRecipeState {
+func NewAddRecipeState(parent State, name string) *AddRecipeState {
 	return &AddRecipeState{
-		Parent:   parent,
-		Services: s,
-		recipe:   schemas.DBRecipe{RecipeName: name},
+		NewStateData(parent),
+		schemas.DBRecipe{RecipeName: name},
 	}
 }
 
-func (s *AddRecipeState) GetError() string {
-	return s.error
-}
 func (s *AddRecipeState) GetOptions() Options {
 	return NewOptions(
 		NewLine("Adding an recipe"),

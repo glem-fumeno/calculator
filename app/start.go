@@ -7,18 +7,15 @@ import (
 )
 
 type StartState struct {
-	Services services.Services
+	*StateData
 }
 
 func NewStartState(database *sql.DB) *StartState {
 	return &StartState{
-		Services: services.NewServices(database),
+		&StateData{Services: services.NewServices(database)},
 	}
 }
 
-func (s *StartState) GetError() string {
-	return ""
-}
 func (s *StartState) GetOptions() Options {
 	return NewOptions(
 		NewLine("Welcome to calculator!"),
@@ -31,9 +28,9 @@ func (s *StartState) GetOptions() Options {
 func (s *StartState) Run(option string) State {
 	switch option {
 	case "I":
-		return NewBrowseItemsState(s, s.Services)
+		return NewBrowseItemsState(s)
 	case "R":
-		return NewBrowseRecipesState(s, s.Services)
+		return NewBrowseRecipesState(s)
 	}
 	return nil
 }

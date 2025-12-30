@@ -4,34 +4,21 @@ import (
 	"fmt"
 
 	"github.com/glem-fumeno/calculator/schemas"
-	"github.com/glem-fumeno/calculator/services"
 )
 
 type EditRecipeState struct {
-	Parent   State
-	Services services.Services
+	*StateData
 
 	recipeName string
 	recipe     schemas.DBRecipe
-	error      string
 }
 
-func NewEditRecipeState(
-	parent State,
-	s services.Services,
-	recipe schemas.DBRecipe,
-) *EditRecipeState {
+func NewEditRecipeState(parent State, recipe schemas.DBRecipe) *EditRecipeState {
 	return &EditRecipeState{
-		Parent:     parent,
-		Services:   s,
-		recipeName: recipe.RecipeName,
-		recipe:     recipe,
+		NewStateData(parent), recipe.RecipeName, recipe,
 	}
 }
 
-func (s *EditRecipeState) GetError() string {
-	return s.error
-}
 func (s *EditRecipeState) GetOptions() Options {
 	ingredients, products, err := s.Services.Recipes.ReadItems(s.recipeName)
 	if err != nil {

@@ -2,32 +2,21 @@ package app
 
 import (
 	"github.com/glem-fumeno/calculator/schemas"
-	"github.com/glem-fumeno/calculator/services"
 )
 
 type AddItemState struct {
-	Parent   State
-	Services services.Services
+	*StateData
 
 	item  schemas.DBItem
-	error string
 }
 
-func NewAddItemState(
-	parent State,
-	s services.Services,
-	name, unit string,
-) *AddItemState {
+func NewAddItemState( parent State, name, unit string) *AddItemState {
 	return &AddItemState{
-		Parent:   parent,
-		Services: s,
-		item:     schemas.DBItem{ItemName: name, Unit: unit},
+		NewStateData(parent),
+		     schemas.DBItem{ItemName: name, Unit: unit},
 	}
 }
 
-func (s *AddItemState) GetError() string {
-	return s.error
-}
 func (s *AddItemState) GetOptions() Options {
 	return NewOptions(
 		NewLine("Adding an item"),

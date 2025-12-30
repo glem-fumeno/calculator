@@ -5,27 +5,18 @@ import (
 	"strconv"
 
 	"github.com/glem-fumeno/calculator/schemas"
-	"github.com/glem-fumeno/calculator/services"
 )
 
 type BrowseItemsState struct {
-	Parent   State
-	Services services.Services
+	*StateData
 
-	error string
 	items []schemas.DBItem
 }
 
-func NewBrowseItemsState(
-	parent State,
-	s services.Services,
-) *BrowseItemsState {
-	return &BrowseItemsState{Parent: parent, Services: s}
+func NewBrowseItemsState(parent State) *BrowseItemsState {
+	return &BrowseItemsState{NewStateData(parent), nil}
 }
 
-func (s *BrowseItemsState) GetError() string {
-	return s.error
-}
 func (s *BrowseItemsState) GetOptions() Options {
 	items, err := s.Services.Items.ReadAll()
 	if err != nil {
@@ -46,14 +37,11 @@ func (s *BrowseItemsState) GetOptions() Options {
 func (s *BrowseItemsState) Run(option string) State {
 	switch option {
 	case "A":
-		return NewAddItemState(
-			s, s.Services,
-			GetInput("Name"), GetInput("Unit"),
-		)
+		return NewAddItemState(s, GetInput("Name"), GetInput("Unit"))
 	case "B":
 		return s.Parent
 	default:
 		i, _ := strconv.Atoi(option)
-		return NewEditItemState(s, s.Services, s.items[i-1])
+		return NewEditItemState(s, s.items[i-1])
 	}
 }
