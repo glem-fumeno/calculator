@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/glem-fumeno/calculator/schemas"
 	"github.com/glem-fumeno/calculator/services"
 	"github.com/glem-fumeno/calculator/tui"
@@ -36,8 +34,8 @@ func (s *AddItemState) GetTitle() string {
 }
 func (s *AddItemState) GetOptions() []tui.Option {
 	return []tui.Option{
-		tui.NewOption("N", fmt.Sprintf("Name: %s", s.item.ItemName)),
-		tui.NewOption("U", fmt.Sprintf("Unit: %s", s.item.Unit)),
+		tui.NewOption("N", "Name: %s", s.item.ItemName),
+		tui.NewOption("U", "Unit: %s", s.item.Unit),
 		tui.NewOption("S", "Save and go back"),
 		tui.NewOption("B", "Back"),
 	}

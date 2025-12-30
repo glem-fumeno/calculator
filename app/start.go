@@ -35,6 +35,8 @@ func (s *StartState) Run(option string) State {
 	switch option {
 	case "I":
 		return NewBrowseItemsState(s, s.Services)
+	case "R":
+		return NewBrowseRecipesState(s, s.Services)
 	}
 	return nil
 }

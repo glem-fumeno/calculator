@@ -38,8 +38,8 @@ func (s *EditItemState) GetTitle() string {
 }
 func (s *EditItemState) GetOptions() []tui.Option {
 	return []tui.Option{
-		tui.NewOption("N", fmt.Sprintf("Name: %s", s.item.ItemName)),
-		tui.NewOption("U", fmt.Sprintf("Unit: %s", s.item.Unit)),
+		tui.NewOption("N", "Name: %s", s.item.ItemName),
+		tui.NewOption("U", "Unit: %s", s.item.Unit),
 		tui.NewOption("D", "Delete"),
 		tui.NewOption("S", "Save and go back"),
 		tui.NewOption("B", "Back"),

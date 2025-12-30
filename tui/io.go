@@ -13,8 +13,8 @@ type Option struct {
 	text string
 }
 
-func NewOption(key, text string) Option {
-	return Option{key, text}
+func NewOption(key, text string, a ...any) Option {
+	return Option{key, fmt.Sprintf(text, a...)}
 }
 
 func GetInput(prompt string) string {

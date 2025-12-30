@@ -4,12 +4,14 @@ import (
 	"database/sql"
 
 	"github.com/glem-fumeno/calculator/queries/items"
+	"github.com/glem-fumeno/calculator/queries/recipes"
 )
 
 type Queries struct {
 	connection *sql.Tx
 
 	Items items.Queries
+	Recipes recipes.Queries
 }
 
 func NewQueries(database *sql.DB) (*Queries, error) {
@@ -17,7 +19,11 @@ func NewQueries(database *sql.DB) (*Queries, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Queries{connection, items.NewQueries(connection)}, nil
+	return &Queries{
+		connection,
+		items.NewQueries(connection),
+		recipes.NewQueries(connection),
+	}, nil
 }
 
 func (q *Queries) Rollback() error {

@@ -40,10 +40,7 @@ func (s *BrowseItemsState) GetOptions() []tui.Option {
 	for i, item := range items {
 		options = append(
 			options,
-			tui.NewOption(
-				fmt.Sprint(i+1),
-				fmt.Sprintf("%s", item.ItemName),
-			),
+			tui.NewOption(fmt.Sprint(i+1), "%s", item.ItemName),
 		)
 	}
 	return append(
